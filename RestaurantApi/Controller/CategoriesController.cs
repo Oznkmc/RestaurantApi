@@ -21,6 +21,12 @@ namespace RestaurantApi.Controller
         {
             return await _context.Categories.ToListAsync();
         }
+        [HttpGet("{id}")]
+        public async Task<List<Category>> GetCategoryById(int id)
+        {
+            var existing = await _context.Categories.FindAsync(id);
+            return existing == null ? new List<Category>() : new List<Category> { existing };
+        }
          [HttpPost]
          public async Task<Category> PostCategory(Category category)
         {

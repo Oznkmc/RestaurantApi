@@ -21,7 +21,8 @@ namespace RestaurantApi.Controller
         [HttpGet]
         public async Task<List<Product>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+
+            return await _context.Products.Where(x => x.IsAvailable == true).ToListAsync();
         }
         // HttpPost attribute'u, bu metodun HTTP POST isteklerine yanıt vereceğini belirtir. Bu metod, istemciden gelen bir Product nesnesini alır, veritabanına ekler ve kaydeder. Ardından, eklenen ürünü geri döndürür.
         [HttpPost]
