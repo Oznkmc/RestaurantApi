@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantApi.Data;
 using RestaurantApi.Models;
+using RestaurantApi.Models.Dtos;
+using RestaurantApi.Models.DTOs;
 
 
 namespace RestaurantApi.Controller
@@ -17,10 +19,17 @@ namespace RestaurantApi.Controller
             _context = context;
         }
         [HttpGet]
-        public async Task<List<Category>> GetCategories()
+        public async Task<List<CategoryDto>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.Select(x => new CategoryDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                ProductCount = x.Products.Count
+            }).ToListAsync();
         }
+
+
         [HttpGet("{id}")]
         public async Task<List<Category>> GetCategoryById(int id)
         {
@@ -40,6 +49,7 @@ namespace RestaurantApi.Controller
             var existing = await _context.Categories.FindAsync(id);
             existing.Name = category.Name;
             existing.IsActive = category.IsActive;
+            await _context.SaveChangesAsync();
             return category;
         }
         [HttpDelete("{id}")]

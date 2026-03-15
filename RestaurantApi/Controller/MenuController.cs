@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RestaurantApi.Data;
 using RestaurantApi.Models;
-using Microsoft.EntityFrameworkCore;
+using RestaurantApi.Models.DTOs;
 
 namespace RestaurantApi.Controller
 {
@@ -19,10 +20,24 @@ namespace RestaurantApi.Controller
         }
         //HttpGet attribute'u, bu metodun HTTP GET isteklerine yanıt vereceğini belirtir. Bu metod, veritabanındaki tüm ürünleri asenkron olarak alır ve bir liste olarak döndürür.
         [HttpGet]
-        public async Task<List<Product>> GetProducts()
+        [HttpGet]
+        public async Task<List<ProductDto>> GetProducts()
         {
-
-            return await _context.Products.Where(x => x.IsAvailable == true).ToListAsync();
+            return await _context.Products
+                .Include(x => x.Category)
+                .Where(x => x.IsAvailable == true)
+                .Select(x => new ProductDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    Price = x.Price,
+                    Portion = x.Portion,
+                    ImageUrl = x.ImageUrl,
+                    IsAvailable = x.IsAvailable,
+                    CategoryName = x.Category.Name
+                })
+                .ToListAsync();
         }
         // HttpPost attribute'u, bu metodun HTTP POST isteklerine yanıt vereceğini belirtir. Bu metod, istemciden gelen bir Product nesnesini alır, veritabanına ekler ve kaydeder. Ardından, eklenen ürünü geri döndürür.
         [HttpPost]
